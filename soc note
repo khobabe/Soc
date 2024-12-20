@@ -1,0 +1,138 @@
+# Separation of Concerns (SoC)
+
+The **Separation of Concerns (SoC)** principle is a fundamental software design principle that promotes dividing a program into distinct sections, each responsible for a specific functionality. It ensures cleaner, more maintainable, and scalable code by organizing the application into well-defined parts.
+
+---
+
+## Key Idea
+
+The main idea of SoC is that each "concern" (aspect of the application) should be handled by a separate module, file, or component. For example:
+
+- **Controllers**: Handle the application logic and data preparation.
+- **Models**: Handle data and database interactions.
+- **Views**: Handle the presentation layer (user interface).
+
+By keeping these responsibilities separate, you avoid mixing logic and ensure each part of the codebase focuses on a single purpose.
+
+---
+
+## Advantages of Following SoC
+
+1. **Improved Readability**:
+
+   - Code is easier to read and understand because each part has a clear responsibility.
+
+2. **Easier Maintenance**:
+
+   - Changes in one part of the application (e.g., database logic) do not affect unrelated parts (e.g., the user interface).
+
+3. **Better Reusability**:
+
+   - Logic written in one place (e.g., a controller or model) can be reused in other parts of the application.
+
+4. **Enhanced Testability**:
+
+   - Each part can be tested independently, making it easier to ensure correctness.
+
+5. **Greater Scalability**:
+
+   - Applications become easier to extend and scale since concerns are modularized.
+
+---
+
+## Examples of SoC in Laravel
+
+Laravel uses the MVC (Model-View-Controller) architecture to enforce SoC:
+
+### 1. **Model**:
+
+- Represents the data layer.
+- Handles interactions with the database (e.g., retrieving, saving, and updating data).
+- Example:
+  ```php
+  // Appointment model
+  namespace App\Models;
+
+  use Illuminate\Database\Eloquent\Model;
+
+  class Appointment extends Model
+  {
+      protected $fillable = ['status', 'created_at'];
+  }
+  ```
+
+### 2. **Controller**:
+
+- Manages application logic.
+- Prepares data and passes it to the view.
+- Example:
+  ```php
+  public function dashboard()
+  {
+      $data['count_appointment'] = Appointment::all()->count();
+      $data['count_accepted_appointments'] = Appointment::where('status', 'accept')->count();
+      return view('admin.dashboard', $data);
+  }
+  ```
+
+### 3. **View**:
+
+- Handles presentation logic (HTML and Blade templates).
+- Displays the data provided by the controller.
+- Example:
+  ```html
+  <div class="small-box bg-success">
+      <div class="inner">
+          <h3>{{ $count_accepted_appointments }}</h3>
+          <p>Accepted Appointments</p>
+      </div>
+      <div class="icon">
+          <i class="ion ion-stats-bars"></i>
+      </div>
+      <a href="{{ route('admin.dashboard') }}" class="small-box-footer">
+          More info <i class="fas fa-arrow-circle-right"></i>
+      </a>
+  </div>
+  ```
+
+---
+
+## Why Querying in Views Violates SoC
+
+Querying the database in the view (e.g., `\App\Models\Appointment::where()` in Blade) mixes business logic with presentation logic, which:
+
+1. **Reduces Readability**:
+
+   - Blade files become cluttered and harder to read.
+
+2. **Hurts Maintainability**:
+
+   - Changes to the logic require modifications in multiple views.
+
+3. **Decreases Performance**:
+
+   - Queries executed directly in views can cause redundant database calls, leading to inefficiency.
+
+4. **Makes Testing Difficult**:
+
+   - Business logic embedded in views cannot be tested independently.
+
+---
+
+## Summary
+
+Separation of Concerns ensures that:
+
+- Models focus on data handling.
+- Controllers focus on logic and data preparation.
+- Views focus on presentation.
+
+This principle, when followed, leads to:
+
+- Cleaner code.
+- Easier maintenance.
+- Better scalability.
+- A more organized application overall.
+
+By leveraging Laravel’s MVC structure, you can naturally follow SoC and build robust, maintainable applications.
+
